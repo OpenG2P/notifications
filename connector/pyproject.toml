@@ -1,0 +1,40 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "openg2p-notification"
+authors = [
+  { name="OpenG2P", email="info@openg2p.org" },
+]
+description = "OpenG2P notification connector: factory + interface + provider for send / send-bulk triggers."
+readme = "README.md"
+requires-python = ">=3.10"
+license = "MPL-2.0"
+classifiers = [
+  "Programming Language :: Python :: 3",
+  "License :: OSI Approved :: Mozilla Public License 2.0 (MPL 2.0)",
+  "Operating System :: OS Independent",
+]
+dependencies = [
+  "openg2p-fastapi-common",
+  "novu-py==3.19.0",
+]
+dynamic = ["version"]
+
+[project.optional-dependencies]
+dev = [
+  "pytest >=8",
+]
+
+[project.urls]
+Homepage = "https://openg2p.org"
+Documentation = "https://docs.openg2p.org/"
+Repository = "https://github.com/OpenG2P/notifications"
+
+[tool.hatch.version]
+path = "src/openg2p_notification/__init__.py"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["src"]
