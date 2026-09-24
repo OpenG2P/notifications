@@ -71,6 +71,13 @@ class NovuNotifier(NotificationInterface):
             status=NotificationResponseStatus.SUCCESS if ok else NotificationResponseStatus.FAILURE,
         )
 
+    def _skipped(self, notification_id: str) -> NotificationResponse:
+        return NotificationResponse(
+            notification_id=notification_id,
+            response="skipped",
+            status=NotificationResponseStatus.SUCCESS,
+        )
+
     def send(
         self,
         event: str,
@@ -80,6 +87,9 @@ class NovuNotifier(NotificationInterface):
         notification_id: str | None = None,
     ) -> NotificationResponse:
         workflow_id, nid = ids(event, entity_id, notification_id)
+        if not workflow_id:
+            _logger.info("Skipping event %s; not in NOTIFICATION_WORKFLOWS", event)
+            return self._skipped(nid)
         body = self._trigger_body(nid, payload, workflow_id, recipient)
         _logger.info(
             "Sending event %s workflow %s to recipient_id=%s notification_id=%s",
@@ -100,19 +110,23 @@ class NovuNotifier(NotificationInterface):
             return []
         if len(requests) > _BULK_LIMIT:
             raise ValueError(f"send_bulk supports at most {_BULK_LIMIT} events per call")
-        resolved: list[tuple[str, dict[str, Any]]] = []
-        for item in requests:
+        results: list[NotificationResponse | None] = [None] * len(requests)
+        resolved: list[tuple[int, str, dict[str, Any]]] = []
+        for index, item in enumerate(requests):
             workflow_id, nid = ids(item.event, item.entity_id, item.notification_id)
-            resolved.append((nid, self._trigger_body(nid, item.payload, workflow_id, item.recipient)))
-        with self._client() as novu:
-            novu_response = novu.trigger_bulk(
-                bulk_trigger_event_dto={"events": [body for _, body in resolved]}
-            )
-        rows = novu_response.result if isinstance(novu_response.result, list) else []
-        return [
-            self._map_result(nid, rows[i] if i < len(rows) else None)
-            for i, (nid, _) in enumerate(resolved)
-        ]
+            if not workflow_id:
+                results[index] = self._skipped(nid)
+                continue
+            resolved.append((index, nid, self._trigger_body(nid, item.payload, workflow_id, item.recipient)))
+        if resolved:
+            with self._client() as novu:
+                novu_response = novu.trigger_bulk(
+                    bulk_trigger_event_dto={"events": [body for _, _, body in resolved]}
+                )
+            rows = novu_response.result if isinstance(novu_response.result, list) else []
+            for i, (index, nid, _) in enumerate(resolved):
+                results[index] = self._map_result(nid, rows[i] if i < len(rows) else None)
+        return results
 
 
 NotificationFactory.register("novu", NovuNotifier)

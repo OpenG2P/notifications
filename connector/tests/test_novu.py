@@ -12,7 +12,13 @@ from openg2p_notification.core.models import (
     Recipient,
 )
 from openg2p_notification.providers import NovuNotifier
-from openg2p_notification.utils import ids, notification_id, registrant_id, resolve_workflow_id
+from openg2p_notification.utils import (
+    ids,
+    notification_id,
+    registrant_id,
+    resolve_workflow_id,
+    workflow_enabled,
+)
 
 
 @pytest.fixture(autouse=True)
@@ -71,9 +77,9 @@ def test_notification_id():
         notification_id("change_request.created", "")
 
 
-def test_ids_identity():
+def test_ids_skips_unmapped_event():
     assert ids("change_request.created", "cr-1") == (
-        "change_request.created",
+        None,
         "change_request.created:cr-1",
     )
 
@@ -101,10 +107,46 @@ def test_resolve_workflow_id_map(monkeypatch):
     )
     config_registry.set(None)
     assert resolve_workflow_id("change_request.created") == "change-request-created"
-    assert resolve_workflow_id("cr.approved") == "cr.approved"
+    assert resolve_workflow_id("cr.approved") is None
+    assert workflow_enabled("change_request.created") is True
+    assert workflow_enabled("cr.approved") is False
 
 
-def test_send_uses_event_as_workflow_and_builds_notification_id():
+def test_resolve_workflow_id_empty_map_and_blank_value(monkeypatch):
+    assert resolve_workflow_id("change_request.created") is None
+    assert workflow_enabled("change_request.created") is False
+    monkeypatch.setenv("NOTIFICATION_WORKFLOWS", '{"change_request.created": "  "}')
+    config_registry.set(None)
+    assert resolve_workflow_id("change_request.created") is None
+    assert workflow_enabled("change_request.created") is False
+
+
+def test_send_skips_unmapped_event():
+    ctx, novu = _patch_client(_processed())
+    with ctx:
+        result = NovuNotifier().send(
+            "change_request.created",
+            "cr-1",
+            {"change_request_id": "cr-1"},
+            Recipient(
+                recipient_id="person:rec-1",
+                recipient_email="ada@example.com",
+                recipient_phone="+10000000000",
+                recipient_name="Ada",
+            ),
+        )
+    novu.trigger.assert_not_called()
+    assert result.response == "skipped"
+    assert result.status is NotificationResponseStatus.SUCCESS
+    assert result.notification_id == "change_request.created:cr-1"
+
+
+def test_send_maps_and_builds_notification_id(monkeypatch):
+    monkeypatch.setenv(
+        "NOTIFICATION_WORKFLOWS",
+        '{"change_request.created": "change-request-created"}',
+    )
+    config_registry.set(None)
     ctx, novu = _patch_client(_processed())
     with ctx:
         result = NovuNotifier().send(
@@ -119,7 +161,7 @@ def test_send_uses_event_as_workflow_and_builds_notification_id():
             ),
         )
     body = novu.trigger.call_args.kwargs["trigger_event_request_dto"]
-    assert body["workflow_id"] == "change_request.created"
+    assert body["workflow_id"] == "change-request-created"
     assert body["to"]["subscriber_id"] == "person:rec-1"
     assert body["to"]["email"] == "ada@example.com"
     assert body["to"]["phone"] == "+10000000000"
@@ -147,7 +189,12 @@ def test_send_maps_event_to_workflow(monkeypatch):
     assert body["transaction_id"] == "change_request.created:cr-1"
 
 
-def test_send_rejects_empty_recipient_id():
+def test_send_rejects_empty_recipient_id(monkeypatch):
+    monkeypatch.setenv(
+        "NOTIFICATION_WORKFLOWS",
+        '{"change_request.created": "change-request-created"}',
+    )
+    config_registry.set(None)
     ctx, _novu = _patch_client(_processed())
     with ctx:
         with pytest.raises(ValueError, match="recipient_id"):
@@ -159,7 +206,12 @@ def test_send_rejects_empty_recipient_id():
             )
 
 
-def test_send_bulk():
+def test_send_bulk_sends_only_mapped_events(monkeypatch):
+    monkeypatch.setenv(
+        "NOTIFICATION_WORKFLOWS",
+        '{"change_request.created": "change-request-created"}',
+    )
+    config_registry.set(None)
     ctx, novu = _patch_client(
         SimpleNamespace(
             result=[
@@ -177,23 +229,21 @@ def test_send_bulk():
                     recipient=Recipient(recipient_id="person:1"),
                 ),
                 NotificationRequest(
-                    event="change_request.created",
+                    event="change_request.approved",
                     entity_id="2",
                     recipient=Recipient(recipient_id="person:2"),
                 ),
             ]
         )
     events = novu.trigger_bulk.call_args.kwargs["bulk_trigger_event_dto"]["events"]
-    assert [item["to"]["subscriber_id"] for item in events] == ["person:1", "person:2"]
-    assert [item["transaction_id"] for item in events] == [
-        "change_request.created:1",
-        "change_request.created:2",
-    ]
+    assert [item["to"]["subscriber_id"] for item in events] == ["person:1"]
+    assert [item["workflow_id"] for item in events] == ["change-request-created"]
     assert [item.notification_id for item in results] == [
         "change_request.created:1",
-        "change_request.created:2",
+        "change_request.approved:2",
     ]
-    assert all(item.status is NotificationResponseStatus.SUCCESS for item in results)
+    assert results[0].status is NotificationResponseStatus.SUCCESS
+    assert results[1].response == "skipped"
 
 
 def test_send_bulk_limit():
@@ -212,6 +262,7 @@ def test_send_bulk_limit():
 
 
 def test_missing_api_key(monkeypatch):
+    monkeypatch.setenv("NOTIFICATION_WORKFLOWS", '{"x": "x"}')
     monkeypatch.delenv("NOTIFICATION_PROVIDER_API_KEY", raising=False)
     config_registry.set(None)
     with pytest.raises(ValueError, match="NOTIFICATION_PROVIDER_API_KEY"):
