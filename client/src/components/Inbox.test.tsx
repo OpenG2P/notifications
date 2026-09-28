@@ -4,9 +4,9 @@ import { Inbox } from "@/components/Inbox";
 
 const config = {
   provider: "novu",
-  subscriberId: "user-1",
+  subscriber: { subscriberId: "user-1" },
   applicationIdentifier: "app-1",
-  subscriberhash: "1234567890",
+  subscriberHash: "1234567890",
 };
 
 const { session, useDialogFocus } = vi.hoisted(() => ({

@@ -16,7 +16,7 @@ function stableSerialize(value: unknown): string {
 
 export function connectionKey(config: NotificationConnection): string {
   return [
-    config.subscriberId ?? "",
+    config.subscriber?.subscriberId ?? "",
     config.applicationIdentifier ?? "",
     config.subscriberHash ?? "",
     config.backendUrl ?? "",

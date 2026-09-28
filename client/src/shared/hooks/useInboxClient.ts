@@ -21,7 +21,6 @@ export function useInboxClient(
   errorFallback: string
 ): InboxClient {
   const connection = {
-    subscriberId: config.subscriberId,
     subscriber: config.subscriber,
     applicationIdentifier: config.applicationIdentifier,
     subscriberHash: config.subscriberHash,
