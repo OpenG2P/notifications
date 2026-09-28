@@ -29,7 +29,7 @@ class TestService {
 
 const config = {
   provider: "test",
-  subscriberId: "user-1",
+  subscriber: { subscriberId: "user-1" },
   applicationIdentifier: "app-1",
   subscriberHash: "hash",
   backendUrl: "https://api.example.com",
@@ -53,12 +53,11 @@ describe("useInboxClient", () => {
 
     expect(client).toBeInstanceOf(TestService);
     expect(client.connection).toEqual({
-      subscriberId: "user-1",
+      subscriber: { subscriberId: "user-1" },
       applicationIdentifier: "app-1",
       subscriberHash: "hash",
       backendUrl: "https://api.example.com",
       socketUrl: "wss://ws.example.com",
-      subscriber: undefined,
       context: undefined,
       contextHash: undefined,
     });
@@ -84,7 +83,10 @@ describe("useInboxClient", () => {
   it("reconnects when the connection key changes", () => {
     const { result, rerender } = renderHook(
       ({ subscriberId }) =>
-        useInboxClient({ ...config, subscriberId }, "Couldn't connect"),
+        useInboxClient(
+          { ...config, subscriber: { subscriberId } },
+          "Couldn't connect"
+        ),
       { initialProps: { subscriberId: "user-1" } }
     );
     const first = result.current.client as TestService;
@@ -95,7 +97,7 @@ describe("useInboxClient", () => {
     expect(first.disconnect).toHaveBeenCalledOnce();
     expect(second).toBeInstanceOf(TestService);
     expect(second).not.toBe(first);
-    expect(second.connection.subscriberId).toBe("user-2");
+    expect(second.connection.subscriber?.subscriberId).toBe("user-2");
   });
 
   it("stores the connection error when create fails", () => {

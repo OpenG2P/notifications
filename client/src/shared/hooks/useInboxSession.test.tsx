@@ -52,7 +52,7 @@ vi.mock("@/shared/hooks/useInboxRealtime", () => ({
 
 const config = {
   provider: "novu",
-  subscriberId: "user-1",
+  subscriber: { subscriberId: "user-1" },
   applicationIdentifier: "app-1",
 };
 
