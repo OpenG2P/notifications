@@ -13,6 +13,7 @@ class Settings(BaseSettings):
         extra="allow",
     )
 
+    enabled: bool = True
     provider: str = "novu"
     provider_url: str = "http://localhost:3000"
     provider_api_key: str = ""

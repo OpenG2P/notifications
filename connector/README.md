@@ -30,13 +30,14 @@ dependencies = [
 
 | Env | Default | Meaning |
 | --- | --- | --- |
+| `NOTIFICATION_ENABLED` | `true` | Master switch. `false` skips every send. |
 | `NOTIFICATION_PROVIDER` | `novu` | Module name under `providers/` |
 | `NOTIFICATION_PROVIDER_URL` | `http://localhost:3000` | Provider API base URL |
 | `NOTIFICATION_PROVIDER_API_KEY` | _(empty)_ | Secret key (Novu dashboard **Secret Key**, not the docker `NOVU_SECRET_KEY`) |
 | `NOTIFICATION_PROVIDER_TIMEOUT_MS` | `20000` | HTTP timeout |
-| `NOTIFICATION_WORKFLOWS` | `{}` | JSON map of event key → provider workflow / template id. Missing keys use the event as-is. |
+| `NOTIFICATION_WORKFLOWS` | `{}` | JSON allow-list of event key → provider workflow / template id. `{}` sends nothing. Missing or blank keys are skipped. |
 
-Create workflows in the Novu dashboard. Prefer using the **same string** as the OpenG2P event key (for example `change_request.created`). Override per env only when the provider id differs:
+Create workflows in the Novu dashboard. List only the events this environment should send:
 
 ```bash
 NOTIFICATION_WORKFLOWS={"change_request.created":"change-request-created"}

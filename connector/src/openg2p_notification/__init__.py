@@ -8,7 +8,7 @@ from .core.models import (
     NotificationResponseStatus,
     Recipient,
 )
-from .utils import ids, notification_id, registrant_id, resolve_workflow_id
+from .utils import ids, notification_id, registrant_id, resolve_workflow_id, workflow_enabled
 
 __all__ = [
     "NotificationFactory",
@@ -21,5 +21,6 @@ __all__ = [
     "notification_id",
     "registrant_id",
     "resolve_workflow_id",
+    "workflow_enabled",
     "__version__",
 ]
