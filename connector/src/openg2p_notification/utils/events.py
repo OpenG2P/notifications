@@ -18,7 +18,9 @@ def resolve_workflow_id(event: str) -> str | None:
 
 
 def workflow_enabled(event: str) -> bool:
-    """True when ``NOTIFICATION_WORKFLOWS`` has a non-empty mapping for ``event``."""
+    """True when notifications are on and ``event`` is in ``NOTIFICATION_WORKFLOWS``."""
+    if not Settings.get_config().enabled:
+        return False
     if not (event or "").strip():
         return False
     return resolve_workflow_id(event) is not None

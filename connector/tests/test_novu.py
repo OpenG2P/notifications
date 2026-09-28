@@ -25,6 +25,7 @@ from openg2p_notification.utils import (
 def _reset(monkeypatch):
     component_registry.clear()
     config_registry.set(None)
+    monkeypatch.setenv("NOTIFICATION_ENABLED", "true")
     monkeypatch.setenv("NOTIFICATION_PROVIDER", "novu")
     monkeypatch.setenv("NOTIFICATION_PROVIDER_API_KEY", "test-key")
     monkeypatch.setenv("NOTIFICATION_PROVIDER_URL", "http://novu.test")
@@ -139,6 +140,26 @@ def test_send_skips_unmapped_event():
     assert result.response == "skipped"
     assert result.status is NotificationResponseStatus.SUCCESS
     assert result.notification_id == "change_request.created:cr-1"
+
+
+def test_send_skips_when_notifications_disabled(monkeypatch):
+    monkeypatch.setenv("NOTIFICATION_ENABLED", "false")
+    monkeypatch.setenv(
+        "NOTIFICATION_WORKFLOWS",
+        '{"change_request.created": "change-request-created"}',
+    )
+    config_registry.set(None)
+    ctx, novu = _patch_client(_processed())
+    with ctx:
+        result = NovuNotifier().send(
+            "change_request.created",
+            "cr-1",
+            {"change_request_id": "cr-1"},
+            Recipient(recipient_id="person:rec-1", recipient_email="ada@example.com"),
+        )
+    novu.trigger.assert_not_called()
+    assert result.response == "skipped"
+    assert workflow_enabled("change_request.created") is False
 
 
 def test_send_maps_and_builds_notification_id(monkeypatch):

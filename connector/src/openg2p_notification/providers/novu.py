@@ -87,6 +87,9 @@ class NovuNotifier(NotificationInterface):
         notification_id: str | None = None,
     ) -> NotificationResponse:
         workflow_id, nid = ids(event, entity_id, notification_id)
+        if not Settings.get_config().enabled:
+            _logger.info("Skipping event %s; notifications are disabled", event)
+            return self._skipped(nid)
         if not workflow_id:
             _logger.info("Skipping event %s; not in NOTIFICATION_WORKFLOWS", event)
             return self._skipped(nid)
@@ -108,6 +111,12 @@ class NovuNotifier(NotificationInterface):
     ) -> list[NotificationResponse]:
         if not requests:
             return []
+        if not Settings.get_config().enabled:
+            _logger.info("Skipping bulk send; notifications are disabled")
+            return [
+                self._skipped(ids(item.event, item.entity_id, item.notification_id)[1])
+                for item in requests
+            ]
         if len(requests) > _BULK_LIMIT:
             raise ValueError(f"send_bulk supports at most {_BULK_LIMIT} events per call")
         results: list[NotificationResponse | None] = [None] * len(requests)

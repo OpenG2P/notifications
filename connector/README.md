@@ -30,6 +30,7 @@ dependencies = [
 
 | Env | Default | Meaning |
 | --- | --- | --- |
+| `NOTIFICATION_ENABLED` | `true` | Master switch. `false` skips every send. |
 | `NOTIFICATION_PROVIDER` | `novu` | Module name under `providers/` |
 | `NOTIFICATION_PROVIDER_URL` | `http://localhost:3000` | Provider API base URL |
 | `NOTIFICATION_PROVIDER_API_KEY` | _(empty)_ | Secret key (Novu dashboard **Secret Key**, not the docker `NOVU_SECRET_KEY`) |
