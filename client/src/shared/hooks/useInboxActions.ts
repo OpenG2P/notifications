@@ -131,14 +131,10 @@ export function useInboxActions(
       const active = clientRef.current;
       if (!active) return;
       await runOnIds(ids, (id) => active.archive(id), (prev) =>
-        filter === "all"
-          ? prev.map((item) =>
-              ids.includes(item.id) ? { ...item, archived: true } : item
-            )
-          : prev.filter((item) => !ids.includes(item.id))
+        prev.filter((item) => !ids.includes(item.id))
       );
     },
-    [clientRef, filter, runOnIds]
+    [clientRef, runOnIds]
   );
 
   const unarchive = useCallback(

@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState, type ReactNode } from "react";
 import { InboxSessionProvider, useDialogFocus, useInboxSession } from "@/shared/hooks";
 import type { NotificationInboxProps } from "@/shared/types";
+import { notificationThemeToCssVars } from "@/shared/types";
 import { Bell } from "@/components/Bell";
 import { InboxPanel } from "@/components/InboxPanel";
 
@@ -57,10 +58,13 @@ function InboxShell({ children }: { children?: ReactNode }) {
 }
 
 export function Inbox(props: NotificationInboxProps) {
-  const { children, ...sessionProps } = props;
+  const { children, theme, ...sessionProps } = props;
+  const cssVars = notificationThemeToCssVars(theme);
   return (
     <InboxSessionProvider {...sessionProps}>
-      <InboxShell>{children}</InboxShell>
+      <div style={cssVars as React.CSSProperties}>
+        <InboxShell>{children}</InboxShell>
+      </div>
     </InboxSessionProvider>
   );
 }

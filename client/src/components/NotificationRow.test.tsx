@@ -119,7 +119,7 @@ describe("NotificationRow", () => {
 
     fireEvent.click(getByRole("button", { name: "Archive" }));
     expect(session.archive).toHaveBeenCalledWith(["n1"]);
-    expect(getByRole("listitem")).toHaveClass("bg-indigo-50/40");
+    expect(getByRole("listitem")).toHaveClass("bg-[var(--ogp-inbox-accent-soft)]");
   });
 
   it("shows unarchive instead of mark-read on archived items", () => {

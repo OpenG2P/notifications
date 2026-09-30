@@ -21,7 +21,7 @@ describe("Avatar", () => {
   it("uses the accented styles when accented is true", () => {
     const { getByTitle } = render(<Avatar name="Ada" accented />);
 
-    expect(getByTitle("Ada")).toHaveClass("bg-indigo-50", "text-indigo-500");
+    expect(getByTitle("Ada")).toHaveClass("bg-[var(--ogp-inbox-accent-soft)]", "text-[var(--ogp-inbox-accent)]");
   });
 
   it("switches to the icon when the image fails to load", () => {

@@ -185,10 +185,9 @@ describe("useInboxList", () => {
     expect(result.current.selectedIds).toEqual(["n2"]);
   });
 
-  it("loads more using active and archived cursors", async () => {
+  it("loads more from the last item on the all filter", async () => {
     const first = [
       item({ id: "active-1", archived: false, createdAt: "2026-01-03T00:00:00.000Z" }),
-      item({ id: "archived-1", archived: true, createdAt: "2026-01-01T00:00:00.000Z" }),
     ];
     const nextPage = [
       item({ id: "active-2", archived: false, createdAt: "2026-01-02T00:00:00.000Z" }),
@@ -210,13 +209,11 @@ describe("useInboxList", () => {
     expect(service.list).toHaveBeenLastCalledWith({
       limit: 20,
       after: "active-1",
-      archivedAfter: "archived-1",
       filter: "all",
     });
     expect(result.current.notifications.map((entry) => entry.id)).toEqual([
       "active-1",
       "active-2",
-      "archived-1",
     ]);
     expect(result.current.hasMore).toBe(false);
     expect(result.current.loadingMore).toBe(false);
@@ -252,7 +249,6 @@ describe("useInboxList", () => {
     expect(service.list).toHaveBeenLastCalledWith({
       limit: 20,
       after: "u2",
-      archivedAfter: undefined,
       filter: "unread",
     });
     expect(result.current.notifications.map((entry) => entry.id)).toEqual([

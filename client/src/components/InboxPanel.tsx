@@ -14,7 +14,7 @@ import { NotificationRow } from "@/components/NotificationRow";
 function FilterTabs() {
   const { filter, setFilter, copy, unreadCount, readCount, archivedCount, listId } =
     useInboxSession();
-  const allCount = unreadCount + readCount + archivedCount;
+  const allCount = unreadCount + readCount;
   const tabRefs = useRef<Partial<Record<NotificationFilter, HTMLButtonElement | null>>>(
     {}
   );
@@ -51,7 +51,7 @@ function FilterTabs() {
 
   return (
     <div
-      className="mx-4 mb-3.5 grid grid-cols-3 gap-1 rounded-full bg-neutral-100 p-1 sm:mx-5 sm:mb-4"
+      className="mx-4 mb-3.5 grid grid-cols-3 gap-1 rounded-[10px] bg-[var(--ogp-inbox-surface-muted)] p-1 sm:mx-5 sm:mb-4"
       role="tablist"
       aria-label={copy.notifications}
     >
@@ -72,16 +72,16 @@ function FilterTabs() {
             }}
             onClick={() => setFilter(option.value)}
             onKeyDown={(event) => onTabKeyDown(event, index)}
-            className={`flex min-w-0 items-center justify-center gap-2 rounded-full px-2 py-1.5 text-[12.5px] font-medium transition-all duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 sm:px-3 sm:py-[7px] sm:text-[13px] ${
+            className={`flex min-w-0 items-center justify-center gap-2 rounded-[10px] px-2 py-1.5 text-[12.5px] font-medium transition-all duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ogp-inbox-accent)] sm:px-3 sm:py-[7px] sm:text-[13px] ${
               selected
-                ? "bg-white text-black shadow-[0_1px_3px_rgba(15,23,42,0.12)]"
-                : "text-neutral-500 hover:text-black"
+                ? "bg-[var(--ogp-inbox-surface)] text-[var(--ogp-inbox-text)] shadow-[0_1px_3px_rgba(15,23,42,0.12)]"
+                : "text-[var(--ogp-inbox-text-muted)] hover:text-[var(--ogp-inbox-text)]"
             }`}
           >
             <span className="truncate">{option.label}</span>
             <span
               className={`shrink-0 text-[12px] tabular-nums ${
-                selected ? "text-indigo-500" : "text-neutral-400"
+                selected ? "text-[var(--ogp-inbox-accent)]" : "text-[var(--ogp-inbox-text-muted)]"
               }`}
             >
               {option.count > 99 ? "99+" : option.count}
@@ -131,12 +131,12 @@ export function InboxPanel({
       aria-modal="true"
       aria-labelledby={titleId}
     >
-      <div className="relative z-[2] flex max-h-[min(70dvh,calc(100dvh-5.5rem))] flex-col overflow-hidden rounded-xl border border-black/[0.06] bg-white shadow-[0_20px_48px_-12px_rgba(15,23,42,0.22)] sm:max-h-none">
-        <div className="bg-white pt-3 sm:pt-4">
+      <div className="relative z-[2] flex max-h-[min(70dvh,calc(100dvh-5.5rem))] flex-col overflow-hidden rounded-[10px] border border-[var(--ogp-inbox-border)] bg-[var(--ogp-inbox-surface)] shadow-[0_20px_48px_-12px_rgba(15,23,42,0.22)] sm:max-h-none">
+        <div className="bg-[var(--ogp-inbox-surface)] pt-3 sm:pt-4">
           <div className="flex items-center justify-between gap-3 px-4 pb-3 sm:px-5 sm:pb-3.5">
             <h2
               id={titleId}
-              className="m-0 min-w-0 text-[16px] font-semibold tracking-tight text-black sm:text-[16.5px]"
+              className="m-0 min-w-0 text-[16px] font-semibold tracking-tight text-[var(--ogp-inbox-text)] sm:text-[16.5px]"
             >
               {copy.notifications}
             </h2>
@@ -144,7 +144,7 @@ export function InboxPanel({
               {filter !== "archived" && unreadIds.length > 0 ? (
                 <button
                   type="button"
-                  className="rounded-full px-2.5 py-1 text-[12.5px] font-medium text-neutral-400 transition-colors duration-150 hover:bg-neutral-100 hover:text-black focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500"
+                  className="rounded-[10px] px-2.5 py-1 text-[12.5px] font-bold text-[var(--ogp-inbox-text)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ogp-inbox-accent)]"
                   onClick={() => void markAllRead()}
                 >
                   {copy.markAllAsRead}
@@ -153,7 +153,7 @@ export function InboxPanel({
               <button
                 type="button"
                 aria-label={copy.close}
-                className="flex h-7 w-7 items-center justify-center rounded-full text-neutral-400 transition-colors duration-150 hover:bg-neutral-100 hover:text-black focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500"
+                className="flex h-7 w-7 items-center justify-center rounded-[10px] text-[var(--ogp-inbox-text-muted)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ogp-inbox-accent)]"
                 onClick={() => setOpen(false)}
               >
                 <X size={15} strokeWidth={1.8} aria-hidden="true" />
@@ -163,28 +163,28 @@ export function InboxPanel({
           <FilterTabs />
         </div>
 
-        <div className="relative min-h-0 flex-1 border-t border-neutral-100 sm:flex-none">
+        <div className="relative min-h-0 flex-1 border-t border-[var(--ogp-inbox-border)] sm:flex-none">
           <div
             id={listId}
             role="tabpanel"
             aria-labelledby={`${listId}-${filter}`}
-            className="h-full divide-y divide-neutral-100 overflow-y-auto pb-4 sm:h-auto sm:max-h-[min(420px,calc(100vh-160px))]"
+            className="h-full divide-y divide-[var(--ogp-inbox-border)] overflow-y-auto pb-4 sm:h-auto sm:max-h-[min(420px,calc(100vh-160px))]"
             aria-busy={loading}
           >
             {loading ? (
-              <div className="flex flex-col items-center gap-2.5 py-14 text-center text-neutral-400" aria-live="polite">
-                <Loader2 size={20} strokeWidth={2} className="animate-spin text-neutral-300" />
+              <div className="flex flex-col items-center gap-2.5 py-14 text-center text-[var(--ogp-inbox-text-muted)]" aria-live="polite">
+                <Loader2 size={20} strokeWidth={2} className="animate-spin text-[var(--ogp-inbox-text-muted)]" />
                 <p className="m-0 text-[13.5px]">{copy.loading}</p>
               </div>
             ) : error ? (
               <div className="flex flex-col items-center gap-2.5 py-14 text-center" aria-live="assertive">
-                <span className="inline-flex h-9 w-9 items-center justify-center rounded-full bg-red-50 text-red-500">
+                <span className="inline-flex h-9 w-9 items-center justify-center rounded-[10px] bg-red-50 text-red-500">
                   <AlertCircle size={17} strokeWidth={1.9} />
                 </span>
-                <p className="m-0 text-[13.5px] text-neutral-500">{copy.error}</p>
+                <p className="m-0 text-[13.5px] text-[var(--ogp-inbox-text-muted)]">{copy.error}</p>
                 <button
                   type="button"
-                  className="mt-1 rounded-full bg-neutral-900 px-3.5 py-1.5 text-[13px] font-medium text-white transition-colors duration-150 hover:bg-black focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-2"
+                  className="mt-1 rounded-[10px] bg-[var(--ogp-inbox-accent)] px-3.5 py-1.5 text-[13px] font-medium text-[var(--ogp-inbox-on-accent)] transition-colors duration-150 hover:bg-[var(--ogp-inbox-accent-hover)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ogp-inbox-accent)] focus-visible:ring-offset-2"
                   onClick={() => void refresh()}
                 >
                   {copy.retry}
@@ -192,10 +192,10 @@ export function InboxPanel({
               </div>
             ) : notifications.length === 0 ? (
               <div className="flex flex-col items-center gap-2.5 py-14 text-center">
-                <span className="inline-flex h-9 w-9 items-center justify-center rounded-full bg-neutral-100 text-neutral-300">
+                <span className="inline-flex h-9 w-9 items-center justify-center rounded-[10px] bg-[var(--ogp-inbox-surface-muted)] text-[var(--ogp-inbox-text-muted)]">
                   <InboxIcon size={17} strokeWidth={1.7} />
                 </span>
-                <p className="m-0 text-[13.5px] text-neutral-400">{copy.empty}</p>
+                <p className="m-0 text-[13.5px] text-[var(--ogp-inbox-text-muted)]">{copy.empty}</p>
               </div>
             ) : (
               <div role="list">
@@ -206,16 +206,16 @@ export function InboxPanel({
             )}
           </div>
           <div
-            className="pointer-events-none absolute inset-x-0 bottom-0 h-7 bg-gradient-to-t from-white to-transparent"
+            className="pointer-events-none absolute inset-x-0 bottom-0 h-7 bg-gradient-to-t from-[var(--ogp-inbox-surface)] to-transparent"
             aria-hidden="true"
           />
         </div>
 
         {hasMore && !loading ? (
-          <div className="border-t border-neutral-100 py-2.5 text-center">
+          <div className="border-t border-[var(--ogp-inbox-border)] py-2.5 text-center">
             <button
               type="button"
-              className="inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-[12.5px] font-medium text-neutral-500 transition-colors duration-150 hover:bg-neutral-100 hover:text-black focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 disabled:opacity-40"
+              className="inline-flex items-center gap-1.5 rounded-[10px] px-3 py-1.5 text-[12.5px] font-medium text-[var(--ogp-inbox-text-muted)] transition-colors duration-150 hover:bg-[var(--ogp-inbox-surface-muted)] hover:text-[var(--ogp-inbox-text)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ogp-inbox-accent)] disabled:opacity-40"
               disabled={loadingMore}
               onClick={() => void loadMore()}
             >

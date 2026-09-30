@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type { Notification, NotificationCopy, NotificationFilter } from "@/shared/types";
 import { PAGE_SIZE } from "@/shared/constants";
-import { errorMessage, sortNotifications } from "@/shared/utils";
+import { errorMessage } from "@/shared/utils";
 import type { InboxClient } from "@/shared/hooks/useInboxClient";
 
 export function useInboxList(inboxClient: InboxClient, copy: NotificationCopy) {
@@ -83,32 +83,23 @@ export function useInboxList(inboxClient: InboxClient, copy: NotificationCopy) {
     if (!active || !hasMoreRef.current || loadingMoreRef.current) return;
     const generation = generationRef.current;
     const items = notificationsRef.current;
-    const after =
-      filter === "all"
-        ? [...items].reverse().find((item) => !item.archived)?.id
-        : items[items.length - 1]?.id;
-    const archivedAfter =
-      filter === "all"
-        ? [...items].reverse().find((item) => item.archived)?.id
-        : undefined;
-    if (!after && !archivedAfter) return;
+    const after = items[items.length - 1]?.id;
+    if (!after) return;
     loadingMoreRef.current = true;
     setLoadingMore(true);
     try {
       const list = await active.list({
         limit: PAGE_SIZE,
         after,
-        archivedAfter,
         filter,
       });
       if (!isCurrent(generation)) return;
       setNotifications((prev) => {
         const seen = new Set(prev.map((item) => item.id));
-        const next = [
+        return [
           ...prev,
           ...list.notifications.filter((item) => !seen.has(item.id)),
         ];
-        return filter === "all" ? sortNotifications(next) : next;
       });
       setHasMore(list.hasMore);
     } catch (err) {

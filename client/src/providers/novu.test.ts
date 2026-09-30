@@ -224,55 +224,26 @@ describe("NovuNotificationService", () => {
     expect(novu.lastOptions?.context).toBeUndefined();
   });
 
-  it("lists all notifications by merging active and archived", async () => {
-    novu.notifications.list
-      .mockResolvedValueOnce(
-        okList([{ id: "a", subject: "Active", createdAt: "2026-01-02T00:00:00.000Z" }], true)
-      )
-      .mockResolvedValueOnce(
-        okList([{ id: "b", subject: "Archived", createdAt: "2026-01-01T00:00:00.000Z" }])
-      );
+  it("lists all notifications without archived items", async () => {
+    novu.notifications.list.mockResolvedValueOnce(
+      okList([{ id: "a", subject: "Active", createdAt: "2026-01-02T00:00:00.000Z" }], true)
+    );
 
     const client = new NovuNotificationService(connection);
     const result = await client.list({
       filter: "all",
       after: "cursor-a",
-      archivedAfter: "cursor-b",
     });
 
-    expect(novu.notifications.list).toHaveBeenNthCalledWith(1, {
+    expect(novu.notifications.list).toHaveBeenCalledTimes(1);
+    expect(novu.notifications.list).toHaveBeenCalledWith({
       limit: 20,
       after: "cursor-a",
       archived: false,
       useCache: false,
     });
-    expect(novu.notifications.list).toHaveBeenNthCalledWith(2, {
-      limit: 20,
-      after: "cursor-b",
-      archived: true,
-      useCache: false,
-    });
-    expect(result.notifications.map((item) => item.id)).toEqual(["a", "b"]);
+    expect(result.notifications.map((item) => item.id)).toEqual(["a"]);
     expect(result.hasMore).toBe(true);
-  });
-
-  it("skips empty and duplicate ids when listing all", async () => {
-    novu.notifications.list
-      .mockResolvedValueOnce({ data: { hasMore: false }, error: undefined })
-      .mockResolvedValueOnce(
-        okList([{ id: "a" }, { id: "" }, { id: "a" }], true)
-      )
-      .mockResolvedValueOnce(okList([{ id: "b" }]))
-      .mockResolvedValueOnce({ data: undefined, error: undefined });
-    const client = new NovuNotificationService(connection);
-
-    const first = await client.list();
-    expect(first.notifications.map((item) => item.id)).toEqual(["a"]);
-    expect(first.hasMore).toBe(true);
-
-    const second = await client.list();
-    expect(second.notifications.map((item) => item.id)).toEqual(["b"]);
-    expect(second.hasMore).toBe(false);
   });
 
   it("lists unread notifications with the unread query", async () => {
@@ -334,15 +305,13 @@ describe("NovuNotificationService", () => {
   });
 
   it("throws when the archived list fails", async () => {
-    novu.notifications.list
-      .mockResolvedValueOnce(okList([]))
-      .mockResolvedValueOnce({
-        data: undefined,
-        error: new Error("archived boom"),
-      });
+    novu.notifications.list.mockResolvedValue({
+      data: undefined,
+      error: new Error("archived boom"),
+    });
     const client = new NovuNotificationService(connection);
 
-    await expect(client.list()).rejects.toThrow(
+    await expect(client.list({ filter: "archived" })).rejects.toThrow(
       "[@openg2p/notification] archived boom"
     );
   });

@@ -242,7 +242,7 @@ describe("useInboxActions", () => {
     expect(applyUpdate(list.setNotifications, current)).toEqual([]);
   });
 
-  it("archives on the all filter and removes otherwise", async () => {
+  it("removes archived notifications from the all filter", async () => {
     const current = [item({ id: "n1" }), item({ id: "n2" })];
     const all = setup({ notifications: current });
     await act(async () => {
@@ -250,7 +250,6 @@ describe("useInboxActions", () => {
     });
     expect(all.service?.archive).toHaveBeenCalledWith("n1");
     expect(applyUpdate(all.list.setNotifications, current)).toEqual([
-      expect.objectContaining({ id: "n1", archived: true }),
       expect.objectContaining({ id: "n2" }),
     ]);
 

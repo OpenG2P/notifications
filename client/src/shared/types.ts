@@ -1,5 +1,41 @@
 export type NotificationFilter = "all" | "unread" | "read" | "archived";
 
+
+export type NotificationTheme = {
+  accent?: string;
+  accentHover?: string;
+  accentSoft?: string;
+  surface?: string;
+  surfaceMuted?: string;
+  text?: string;
+  textMuted?: string;
+  border?: string;
+  onAccent?: string;
+};
+
+export function notificationThemeToCssVars(
+  theme?: NotificationTheme
+): Record<string, string> {
+  const accent = theme?.accent ?? "#EABB13";
+  const surface = theme?.surface ?? "#FFFFFF";
+  const surfaceMuted = theme?.surfaceMuted ?? "#F3F1F4";
+  const text = theme?.text ?? "#000000";
+  return {
+    "--ogp-inbox-accent": accent,
+    "--ogp-inbox-accent-hover": theme?.accentHover ?? "#ED7C22",
+    "--ogp-inbox-accent-soft":
+      theme?.accentSoft ??
+      `color-mix(in srgb, ${accent} 12%, ${surface})`,
+    "--ogp-inbox-surface": surface,
+    "--ogp-inbox-surface-muted": surfaceMuted,
+    "--ogp-inbox-surface-muted-hover": `color-mix(in srgb, ${surfaceMuted} 80%, ${text})`,
+    "--ogp-inbox-text": text,
+    "--ogp-inbox-text-muted": theme?.textMuted ?? "#A1A1A1",
+    "--ogp-inbox-border": theme?.border ?? "#E1E1E1",
+    "--ogp-inbox-on-accent": theme?.onAccent ?? "#FFFFFF",
+  };
+}
+
 export type NotificationChannel =
   | "in_app"
   | "email"
@@ -131,6 +167,7 @@ export type NotificationInboxProps = {
   open?: boolean;
   onOpenChange?: (open: boolean) => void;
   localization?: Partial<NotificationCopy> | Record<string, string>;
+  theme?: NotificationTheme;
   children?: import("react").ReactNode;
 };
 
