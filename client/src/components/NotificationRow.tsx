@@ -62,14 +62,16 @@ export function NotificationRow({ notification }: { notification: Notification }
     <div
       ref={rowRef}
       className={`group relative flex cursor-pointer items-start gap-2.5 py-3 pl-3 pr-3 transition-colors duration-150 sm:gap-3 sm:py-3.5 sm:pl-4 sm:pr-4 ${
-        highlight ? "bg-indigo-50/40 hover:bg-indigo-50/70" : "hover:bg-neutral-50"
+        highlight
+          ? "bg-[var(--ogp-inbox-accent-soft)] hover:bg-[var(--ogp-inbox-accent-soft)]"
+          : "hover:bg-[var(--ogp-inbox-surface-muted)]"
       }`}
       role="listitem"
       onClick={() => void openNotification(notification)}
     >
       {highlight ? (
         <span
-          className="absolute left-0 top-1/2 h-6 w-[3px] -translate-y-1/2 rounded-r-full bg-indigo-500"
+          className="absolute left-0 top-1/2 h-6 w-[3px] -translate-y-1/2 rounded-r-[10px] bg-[var(--ogp-inbox-accent)]"
           aria-hidden="true"
         />
       ) : null}
@@ -81,8 +83,8 @@ export function NotificationRow({ notification }: { notification: Notification }
           {heading ? (
             <button
               type="button"
-              className={`min-w-0 flex-1 text-left text-[14px] leading-snug sm:text-[14.5px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 ${
-                isUnread ? "font-semibold text-black" : "font-medium text-neutral-800"
+              className={`min-w-0 flex-1 text-left text-[14px] leading-snug sm:text-[14.5px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ogp-inbox-accent)] ${
+                isUnread ? "font-semibold text-[var(--ogp-inbox-text)]" : "font-medium text-[var(--ogp-inbox-text)]"
               }`}
               onClick={(event) => {
                 event.stopPropagation();
@@ -95,7 +97,7 @@ export function NotificationRow({ notification }: { notification: Notification }
             <span className="min-w-0 flex-1" />
           )}
           {notification.createdAt ? (
-            <span className="shrink-0 pt-0.5 text-[11px] leading-none text-neutral-400 sm:text-[11.5px]">
+            <span className="shrink-0 pt-0.5 text-[11px] leading-none text-[var(--ogp-inbox-text-muted)] sm:text-[11.5px]">
               {formatRelativeTime(notification.createdAt, copy.justNow)}
             </span>
           ) : null}
@@ -118,13 +120,13 @@ export function NotificationRow({ notification }: { notification: Notification }
             type="button"
             title={copy.markAsRead}
             aria-label={copy.markAsRead}
-            className="flex h-7 w-7 items-center justify-center rounded-full text-neutral-300 transition-colors duration-150 hover:bg-indigo-100 hover:text-indigo-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500"
+            className="flex h-7 w-7 items-center justify-center rounded-[10px] text-[var(--ogp-inbox-text)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ogp-inbox-accent)]"
             onClick={(e) => {
               e.stopPropagation();
               void markRead([notification.id]);
             }}
           >
-            <Check size={15} strokeWidth={2.2} />
+            <Check size={15} strokeWidth={2.75} />
           </button>
         ) : null}
         {showArchive ? (
@@ -132,13 +134,13 @@ export function NotificationRow({ notification }: { notification: Notification }
             type="button"
             title={copy.archive}
             aria-label={copy.archive}
-            className="flex h-7 w-7 items-center justify-center rounded-full text-neutral-300 transition-colors duration-150 hover:bg-neutral-100 hover:text-black focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500"
+            className="flex h-7 w-7 items-center justify-center rounded-[10px] text-[var(--ogp-inbox-text)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ogp-inbox-accent)]"
             onClick={(e) => {
               e.stopPropagation();
               void archive([notification.id]);
             }}
           >
-            <Archive size={15} strokeWidth={1.8} />
+            <Archive size={15} strokeWidth={2.5} />
           </button>
         ) : null}
         {showUnarchive ? (
@@ -146,13 +148,13 @@ export function NotificationRow({ notification }: { notification: Notification }
             type="button"
             title={copy.unarchive}
             aria-label={copy.unarchive}
-            className="flex h-7 w-7 items-center justify-center rounded-full text-neutral-300 transition-colors duration-150 hover:bg-neutral-100 hover:text-black focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500"
+            className="flex h-7 w-7 items-center justify-center rounded-[10px] text-[var(--ogp-inbox-text)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ogp-inbox-accent)]"
             onClick={(e) => {
               e.stopPropagation();
               void unarchive([notification.id]);
             }}
           >
-            <ArchiveRestore size={15} strokeWidth={1.8} />
+            <ArchiveRestore size={15} strokeWidth={2.5} />
           </button>
         ) : null}
       </div>

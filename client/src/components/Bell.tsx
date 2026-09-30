@@ -15,7 +15,7 @@ export function Bell({ className = "" }: NotificationBellProps) {
   return (
     <button
       type="button"
-      className={`relative inline-flex h-10 w-10 items-center justify-center text-neutral-600 transition-colors duration-150 hover:text-black focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 focus-visible:ring-offset-2 ${className}`.trim()}
+      className={`relative inline-flex h-10 w-10 items-center justify-center text-[var(--ogp-inbox-text-muted)] transition-colors duration-150 hover:text-[var(--ogp-inbox-text)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ogp-inbox-accent)] focus-visible:ring-offset-2 ${className}`.trim()}
       aria-label={label}
       aria-haspopup="dialog"
       aria-expanded={open}
@@ -25,7 +25,7 @@ export function Bell({ className = "" }: NotificationBellProps) {
       <BellIcon size={19} strokeWidth={1.8} aria-hidden="true" />
       {hasUnread ? (
         <span
-          className="absolute right-1 top-1 flex min-w-[17px] h-[17px] items-center justify-center rounded-full bg-indigo-600 px-1 text-[10px] font-semibold leading-none tabular-nums text-white ring-2 ring-white"
+          className="absolute right-1 top-1 flex min-w-[17px] h-[17px] items-center justify-center rounded-[10px] bg-[var(--ogp-inbox-accent)] px-1 text-[10px] font-semibold leading-none tabular-nums text-[var(--ogp-inbox-on-accent)] ring-2 ring-[var(--ogp-inbox-surface)]"
           aria-hidden="true"
         >
           {badge}

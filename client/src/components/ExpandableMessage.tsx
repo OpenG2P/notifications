@@ -20,7 +20,7 @@ export function ExpandableMessage({
   return (
     <div className="mt-1">
       <p
-        className={`m-0 text-[13px] leading-[1.55] text-neutral-500 sm:text-[13.5px] ${
+        className={`m-0 text-[13px] leading-[1.55] text-[var(--ogp-inbox-text-muted)] sm:text-[13.5px] ${
           canCollapse && !expanded ? "line-clamp-2" : ""
         }`}
       >
@@ -30,7 +30,7 @@ export function ExpandableMessage({
         <button
           type="button"
           aria-expanded={expanded}
-          className="mt-1 inline-flex items-center gap-0.5 text-[12.5px] font-medium text-neutral-400 hover:text-black focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500"
+          className="mt-1 inline-flex items-center gap-0.5 text-[12.5px] font-bold text-[var(--ogp-inbox-text)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ogp-inbox-accent)]"
           onClick={(e) => {
             e.stopPropagation();
             setExpanded((prev) => !prev);

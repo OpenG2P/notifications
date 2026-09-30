@@ -28,10 +28,10 @@ export function NotificationActions({
           <button
             key={key}
             type="button"
-            className={`inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-[12.5px] font-medium transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 ${
+            className={`inline-flex items-center gap-1 rounded-[10px] px-2.5 py-1 text-[12.5px] font-medium transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--ogp-inbox-accent)] ${
               isPrimary
-                ? "bg-indigo-600 text-white hover:bg-indigo-700"
-                : "bg-neutral-100 text-neutral-700 hover:bg-neutral-200"
+                ? "bg-[var(--ogp-inbox-accent)] text-[var(--ogp-inbox-on-accent)]"
+                : "bg-[var(--ogp-inbox-surface-muted)] text-[var(--ogp-inbox-text)]"
             }`}
             onClick={(e) => {
               e.stopPropagation();

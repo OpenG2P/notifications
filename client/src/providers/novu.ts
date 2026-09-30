@@ -10,7 +10,7 @@ import type {
   NotificationWorkflow,
 } from "@/shared/types";
 import type { NotificationService } from "@/core/service";
-import { sortNotifications, throwIfError } from "@/shared/utils";
+import { throwIfError } from "@/shared/utils";
 
 type RawNotification = Partial<InboxNotification> & {
   _id?: string;
@@ -127,21 +127,6 @@ export function toNotification(n: InboxNotification | RawNotification): Notifica
   };
 }
 
-function mergeByCreatedAt(lists: Notification[][]): Notification[] {
-  const seen = new Set<string>();
-  const merged: Notification[] = [];
-
-  for (const list of lists) {
-    for (const item of list) {
-      if (!item.id || seen.has(item.id)) continue;
-      seen.add(item.id);
-      merged.push(item);
-    }
-  }
-
-  return sortNotifications(merged);
-}
-
 function toNovuContext(
   context?: NotificationConnection["context"]
 ): Record<string, string | { id: string; data?: Record<string, unknown> }> | undefined {
@@ -188,38 +173,14 @@ export class NovuNotificationService implements NotificationService {
     const limit = options.limit ?? 20;
     const filter = options.filter ?? "all";
 
-    if (filter === "all") {
-      const [active, archived] = await Promise.all([
-        this.novu.notifications.list({
-          limit,
-          after: options.after,
-          archived: false,
-          useCache: false,
-        }),
-        this.novu.notifications.list({
-          limit,
-          after: options.archivedAfter,
-          archived: true,
-          useCache: false,
-        }),
-      ]);
-      throwIfError(active.error, "list notifications");
-      throwIfError(archived.error, "list archived notifications");
-      return {
-        notifications: mergeByCreatedAt([
-          (active.data?.notifications ?? []).map(toNotification),
-          (archived.data?.notifications ?? []).map(toNotification),
-        ]),
-        hasMore: Boolean(active.data?.hasMore || archived.data?.hasMore),
-      };
-    }
-
     const query =
       filter === "archived"
         ? { archived: true }
         : filter === "unread"
           ? { archived: false, read: false }
-          : { archived: false, read: true };
+          : filter === "read"
+            ? { archived: false, read: true }
+            : { archived: false };
 
     const { data, error } = await this.novu.notifications.list({
       limit,

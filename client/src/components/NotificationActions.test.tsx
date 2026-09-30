@@ -83,8 +83,8 @@ describe("NotificationActions", () => {
       />
     );
 
-    expect(getByRole("button", { name: "Accept" })).toHaveClass("bg-indigo-600");
-    expect(getByRole("button", { name: "Dismiss" })).toHaveClass("bg-neutral-100");
+    expect(getByRole("button", { name: "Accept" })).toHaveClass("bg-[var(--ogp-inbox-accent)]");
+    expect(getByRole("button", { name: "Dismiss" })).toHaveClass("bg-[var(--ogp-inbox-surface-muted)]");
     expect(getByRole("button", { name: "Accept" }).querySelector("svg")).not.toBeNull();
   });
 });

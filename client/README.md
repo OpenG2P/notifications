@@ -96,6 +96,29 @@ import { Inbox } from "@openg2p/notification";
 />
 ```
 
+### Theme
+
+Pass an optional `theme` object to make the inbox follow your application's branding. When omitted, the registry default palette is used (`#EABB13`, `#ED7C22`, `#F3F1F4`, `#E1E1E1`, `#A1A1A1`, `#000000`, `#FFFFFF`).
+
+```tsx
+import type { NotificationTheme } from "@openg2p/notification";
+
+const inboxTheme: NotificationTheme = {
+  accent: "#EABB13",        // badge, unread bar, primary action, focus ring
+  accentHover: "#ED7C22",   // primary action hover
+  surface: "#FFFFFF",       // panel and selected-tab background
+  surfaceMuted: "#F3F1F4",  // tab track, hover backgrounds, secondary action
+  text: "#000000",          // headings, selected labels
+  textMuted: "#A1A1A1",     // timestamps, empty state, secondary labels
+  border: "#E1E1E1",        // panel border and row dividers
+  onAccent: "#FFFFFF",      // text on accent backgrounds (badge, primary action)
+};
+
+<Inbox config={...} theme={inboxTheme} />
+```
+
+`accentSoft` (unread row background) is computed automatically from `accent` and `surface` when not provided.
+
 To swap providers later, implement `NotificationService` and call `NotificationFactory.register("name", Implementation)`.
 
 ## License

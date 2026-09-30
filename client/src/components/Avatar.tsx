@@ -30,7 +30,9 @@ export function Avatar({
   return (
     <span
       className={`inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-full sm:h-[38px] sm:w-[38px] ${
-        accented ? "bg-indigo-50 text-indigo-500" : "bg-neutral-100 text-neutral-400"
+        accented
+          ? "bg-[var(--ogp-inbox-accent-soft)] text-[var(--ogp-inbox-accent)]"
+          : "bg-[var(--ogp-inbox-surface-muted)] text-[var(--ogp-inbox-text-muted)]"
       }`}
       aria-hidden="true"
       title={name}
